@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+		<title>Demos - jQuery Ambar Forms Validator :: JT - Comunicación Interactiva</title>
+		<script src="../js/jquery-1.8.2.min.js"></script>
+		<script src="../development/jquery-afv-0.1.0.js"></script>
+	</head>
+	
+	<script>
+		function success(response)
+		{
+			console.log(response);
+		}
+		
+		function error(response, status)
+		{
+			console.log(status);
+		}
+	</script>
+	
+	<body>
+		<form method="post" action="" data-afv-validate="true">
+			<label>Usuario</label>
+			<input type="text" name="username" data-afv-required="true" data-afv-length-min="5" data-afv-length-max="10"/>
+			<label>Contraseña</label>
+			<input type="password" name="password" id="password" data-afv-required="true"/>
+			<label>Confirmar Contraseña</label>
+			<input type="password" name="password2" data-afv-required="true" data-afv-equal-to="password"/>
+			<input type="button" value="Enviar" data-afv-role="submit" />
+		</form>
+		<form method="post" action="" data-afv-validate="true" data-afv-post-ajax="true" data-afv-ajax-success="success" data-afv-ajax-failure="error">
+			<label>Usuario</label>
+			<input type="text" name="username" data-afv-format="email" />
+			<label>Contraseña</label>
+			<input type="password" name="password" />
+			<label>Tipo de usuario</label>
+			<select name="type" data-afv-default="0">
+				<option value="0">Seleccione</option>
+				<option value="U">Usuario</option>
+				<option value="E">Editor</option>
+				<option value="O">Operador</option>
+			</select>
+			<a href="#" data-afv-role="submit">Ingresar</a>
+		</form>
+	</body>
+</html>
