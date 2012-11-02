@@ -1,4 +1,23 @@
-jquery-afv
-==========
+# jQuery Ambar Forms Validator
 
-jQuery Ambar Forms Validator
+Plugin para jQuery que permite realizar validaciones de formularios de forma sencilla.
+
+Utiliza los atributos data de HTML5 para configurar el plugin
+
+## Changelog
+
+### V0.1.0
+Versión inicial del plugin. Posee sólo funcionalidades básicas que actúan sobre los siguientes tipos de campos
+
++ Todos los input menos checkbox y radio;
++ Select (sólo desplegables);
++ Todo tipo de elementos HTML para disparar la validación y posterior envío del formulario (vía GET, POST o AJAX);
+
+Realiza los siguientes tipos de validaciones
+
++ Campo obligatorio (valida los select a través de la comparación de la opción por defecto);
++ Cantidad mínima y/o máxima de caracteres;
++ Igualdad de valores entre dos campos;
++ Validaciones de formato (email, url, sólo texto, solo números, texto extendido)
+
+Los mensajes de error momentáneamente sólo se muestran marcando el campo con una clase css de error y cargando los mensajes de error en el atributo title del campo en cuestión.
