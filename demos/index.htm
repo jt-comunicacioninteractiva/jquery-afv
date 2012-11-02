@@ -4,7 +4,7 @@
 		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 		<title>Demos - jQuery Ambar Forms Validator :: JT - Comunicación Interactiva</title>
 		<script src="../js/jquery-1.8.2.min.js"></script>
-		<script src="../development/jquery-afv-0.1.0.js"></script>
+		<script src="../js/jquery-afv-0.1.0.min.js"></script>
 	</head>
 	
 	<script>
@@ -19,21 +19,47 @@
 		}
 	</script>
 	
+	<style>
+		.afv-field-error {
+			background: #ffc9cf;
+			border: 1px solid red;
+		} 
+	</style>
+	
 	<body>
+		<h1>Ambar Forms Validator for jQuery</h1>
+		<p>Plugin para jQuery que permite realizar validaciones de formularios previo envío al servidor.</p>
+		<p><strong>Importante:</strong> Toda validación realizada del lado del cliente está expuesta a ser fácilmente vulnerada.
+			Por tal motivo se recomienda que las validaciones que realiza este plugin sean complementadas con validaciones similares
+			del lado del servidor.</p>
+		<h2>Validación básica</h2>
+		<p>El siguiente ejemplo muestra un formulario con las siguientes validaciones</p>
+		<ul>
+			<li><strong>Campo Nombre</strong> obligatorio y 5 caracteres mínimo</li>
+			<li><strong>Campo Email</strong> obligatorio y texto con formato de email</li>
+		</ul>
 		<form method="post" action="" data-afv-validate="true">
-			<label>Usuario</label>
-			<input type="text" name="username" data-afv-required="true" data-afv-length-min="5" data-afv-length-max="10"/>
-			<label>Contraseña</label>
-			<input type="password" name="password" id="password" data-afv-required="true"/>
-			<label>Confirmar Contraseña</label>
-			<input type="password" name="password2" data-afv-required="true" data-afv-equal-to="password"/>
+			<label for="name">Nombre</label>
+			<input type="text" name="name" data-afv-required="true" data-afv-min-length="5" />
+			<label for="surname">Apellido</label>
+			<input type="text" name="surname" />
+			<label for="email">Email</label>
+			<input type="text" name="email" data-afv-required="true" data-afv-format="email" />
 			<input type="button" value="Enviar" data-afv-role="submit" />
 		</form>
+		<h2>Validación básica + Ajax</h2>
+		<p>El siguiente ejemplo muestra un forulario con las siguientes validaciones</p>
+		<ul>
+			<li><strong>Campo Usuario</strong> obligatorio y formato de email válido</li>
+			<li><strong>Contraseña</strong> obligatorio</li>
+			<li><strong>Tipo de Usuario</strong> obligatorio. No permite dejar seleccionada la opción por defecto</li>
+		</ul>
+		<p>Además, en este ejemplo se reemplazó el botón de envío por un tag A (link) demostrando la versatilidad con la que puede personalizarse la apariencia del formulario</p>
 		<form method="post" action="" data-afv-validate="true" data-afv-post-ajax="true" data-afv-ajax-success="success" data-afv-ajax-failure="error">
 			<label>Usuario</label>
-			<input type="text" name="username" data-afv-format="email" />
+			<input type="text" name="username" data-afv-required="true" data-afv-format="email" />
 			<label>Contraseña</label>
-			<input type="password" name="password" />
+			<input type="password" name="password" data-afv-required="true" />
 			<label>Tipo de usuario</label>
 			<select name="type" data-afv-default="0">
 				<option value="0">Seleccione</option>
