@@ -4,7 +4,7 @@
 		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 		<title>Demos - jQuery Ambar Forms Validator :: JT - Comunicación Interactiva</title>
 		<script src="../js/jquery-1.8.2.min.js"></script>
-		<script src="../js/jquery-afv-0.1.0.min.js"></script>
+		<script src="../development/jquery-afv-0.2.0.js"></script>
 	</head>
 	
 	<script>
@@ -20,10 +20,13 @@
 	</script>
 	
 	<style>
-		.afv-field-error {
+		input.afv-field-error {
 			background: #ffc9cf;
 			border: 1px solid red;
 		} 
+		label.afv-field-error {
+			color: #ffc9cf;
+		}
 	</style>
 	
 	<body>
@@ -32,6 +35,8 @@
 		<p><strong>Importante:</strong> Toda validación realizada del lado del cliente está expuesta a ser fácilmente vulnerada.
 			Por tal motivo se recomienda que las validaciones que realiza este plugin sean complementadas con validaciones similares
 			del lado del servidor.</p>
+			
+		<!-- Ejemplo 1: Validación Básica -->
 		<h2>Validación básica</h2>
 		<p>El siguiente ejemplo muestra un formulario con las siguientes validaciones</p>
 		<ul>
@@ -47,7 +52,9 @@
 			<input type="text" name="email" data-afv-required="true" data-afv-format="email" />
 			<input type="button" value="Enviar" data-afv-role="submit" />
 		</form>
-		<h2>Validación básica + Ajax</h2>
+		
+		<!-- Ejemplo 2: Validación Básica + AJAX -->
+		<h2>Validación básica + AJAX</h2>
 		<p>El siguiente ejemplo muestra un forulario con las siguientes validaciones</p>
 		<ul>
 			<li><strong>Campo Usuario</strong> obligatorio y formato de email válido</li>
@@ -56,11 +63,11 @@
 		</ul>
 		<p>Además, en este ejemplo se reemplazó el botón de envío por un tag A (link) demostrando la versatilidad con la que puede personalizarse la apariencia del formulario</p>
 		<form method="post" action="" data-afv-validate="true" data-afv-post-ajax="true" data-afv-ajax-success="success" data-afv-ajax-failure="error">
-			<label>Usuario</label>
+			<label for="username">Usuario</label>
 			<input type="text" name="username" data-afv-required="true" data-afv-format="email" />
-			<label>Contraseña</label>
+			<label for="password">Contraseña</label>
 			<input type="password" name="password" data-afv-required="true" />
-			<label>Tipo de usuario</label>
+			<label for="type">Tipo de usuario</label>
 			<select name="type" data-afv-default="0">
 				<option value="0">Seleccione</option>
 				<option value="U">Usuario</option>
@@ -69,5 +76,18 @@
 			</select>
 			<a href="#" data-afv-role="submit">Ingresar</a>
 		</form>
+		
+		<!-- Ejemplo 3: Validación checkbox -->
+		<h2>Validación checkbox</h2>
+		<form method="post" action="" data-afv-validate="true">
+			<label for="name">Nombre</label>
+			<input type="text" name="name" data-afv-required="true" />
+			<label for="surname">Apellido</label>
+			<input type="text" name="surname" data-afv-required="true" />
+			<label for="terms">Acepto los términos y condiciones</label>
+			<input type="checkbox" name="terms" data-afv-required="true" />
+			<input type="button" value="Enviar" data-afv-role="submit" />
+		</form>
+		
 	</body>
 </html>

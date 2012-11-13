@@ -2,8 +2,8 @@
  * jQuery - Ambar Forms Validator
  *
  * @author Javier Trejo @ JT - Comunicación Interactiva
- * @version 0.1.0
- * @see https://github.com/jt-comunicacioninteractiva/jquery-afv
+ * @version 0.2.0
+ * @see http://jt-comunicacioninteractiva.github.com/jquery-afv
  *
  * Este plugin se utiliza para validar formularios antes de ser enviados al
  * servidor.
@@ -65,14 +65,31 @@
 			form.find("[data-" + defaultOptions.namespace + "-required]").each(function(index, item){
 				var item	= $(item);
 				
-				if(item.val().length == 0)
+				switch(item.attr("type"))
 				{
-					isValid	= false;
-					errorsCollection.push({
-						field	: item,
-						message	: defaultOptions.errorMessages.required,
-						error	: $.ambarFormsValidator.Validator.REQUIRED
-					});	
+					// Control específico para los campos tipo checkbox
+					case "checkbox":
+						if(!item.is(":checked"))
+						{
+							isValid	= false;
+							errorsCollection.push({
+								field	: item,
+								message	: defaultOptions.errorMessages.required,
+								error	: $.ambarFormsValidator.Validator.REQUIRED
+							});	
+						}
+						break;
+					// Control específico para los campos cuyo tipo no esté especificado anteriormente (Ej.: text, password, etc.)
+					default	:
+						if(item.val().length == 0)
+						{
+							isValid	= false;
+							errorsCollection.push({
+								field	: item,
+								message	: defaultOptions.errorMessages.required,
+								error	: $.ambarFormsValidator.Validator.REQUIRED
+							});	
+						};
 				}
 			});
 			
@@ -219,6 +236,18 @@
 			$(errorsCollection).each(function(index, item){
 				item.field.addClass(defaultOptions.errorClass);
 				var msg	= defaultOptions.errorMessages[item.error];
+				
+				// En caso de los checkbox y radio aplica el estilo sobre el label
+				switch(item.field.attr("type"))
+				{
+					case "checkbox":
+						var label	= item.field.attr("name");
+						label		= $('label[for="' + label + '"]');
+
+						label.addClass(defaultOptions.errorClass);
+						label.attr("title", msg);
+						break;
+				}
 				
 				switch(item.error)
 				{
