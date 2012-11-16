@@ -6,6 +6,11 @@ Utiliza los atributos data de HTML5 para configurar el plugin
 
 ## Changelog
 
+### V0.2.0
+Se agregó la funcionalidad que permite realizar las siguientes validaciones:
+
++ Checkbox individuales
+
 ### V0.1.0
 Versión inicial del plugin. Posee sólo funcionalidades básicas que actúan sobre los siguientes tipos de campos
 
