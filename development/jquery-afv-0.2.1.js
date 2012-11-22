@@ -2,7 +2,7 @@
  * jQuery - Ambar Forms Validator
  *
  * @author Javier Trejo @ JT - Comunicación Interactiva
- * @version 0.2.0
+ * @version 0.2.1
  * @see http://jt-comunicacioninteractiva.github.com/jquery-afv
  *
  * Este plugin se utiliza para validar formularios antes de ser enviados al
@@ -34,7 +34,8 @@
 			maxLength		: "El campo debe tener {0} como máximo",
 			defaultOption	: "Debe seleccionar un valor",
 			equalTo			: "Los campos {0} y {1} deben ser iguales",
-			format			: "El valor ingresado no se corresponde con el formato requerido"
+			format			: "El valor ingresado no se corresponde con el formato requerido",
+			minCheckbox		: "Se deben seleccionar al menos {0}"
 		},
 		
 		// Indica la forma en que se muestran los mensajes de error
@@ -45,6 +46,7 @@
 	};
 
 	var methods = {
+		//Inicializa el validador para aquellos formularios que así lo requieren
 		init 	: function(options) {
 			$.extend(defaultOptions, options);
 			
@@ -54,6 +56,8 @@
 					.bind('click', methods.submit);
 			});
 		},
+		
+		//Valida el formulario antes de realizar cualquier acción
 		validate: function(form) {
 			var isValid			= true;
 			
@@ -64,8 +68,12 @@
 			// Controla la propiedad campo obligatorio
 			form.find("[data-" + defaultOptions.namespace + "-required]").each(function(index, item){
 				var item	= $(item);
+				var type	= item.attr("type");
 				
-				switch(item.attr("type"))
+				if(type == undefined)
+					type	= item[0].type;
+				
+				switch(type)
 				{
 					// Control específico para los campos tipo checkbox
 					case "checkbox":
@@ -79,6 +87,40 @@
 							});	
 						}
 						break;
+						
+					// Control especifíco para fieldset que dentro contienen radio
+					case "fieldset":
+						var radios		= item.find('input[type="radio"]');
+						var selected	= false;
+						
+						if(radios.length > 0)
+						{
+							radios.each(function(index, radio){
+								var radio	= $(radio);
+								
+								if(radio.is(":checked"))
+								{
+									selected	= true;
+									return;
+								}
+							});
+							
+							if(!selected)
+							{
+								isValid	= false;
+								errorsCollection.push({
+									field	: item,
+									message	: defaultOptions.errorMessages.required,
+									error	: $.ambarFormsValidator.Validator.REQUIRED
+								});
+							}
+						}						
+						else
+						{
+							console.error("AFV: El elemento no contiene radio buttons en su interior", item);
+						}
+						break;
+						
 					// Control específico para los campos cuyo tipo no esté especificado anteriormente (Ej.: text, password, etc.)
 					default	:
 						if(item.val().length == 0)
@@ -92,6 +134,23 @@
 						};
 				}
 			});
+			
+			//Controla la cantidad mínima de elementos marcados para un grupo de checkbox
+			form.find("[data-" + defaultOptions.namespace +  "-check]").each(function(index, item){
+				var item	= $(item);
+				var target	= item.attr("data-" + defaultOptions.namespace +  "-check");
+				var checked	= item.find('input[type="checkbox"]:checked').length;
+				
+				if(checked < target)
+				{
+					isValid	= false;
+					errorsCollection.push({
+						field	: item,
+						message	: defaultOptions.errorMessages.minCheckbox,
+						error	: $.ambarFormsValidator.Validator.CHECKBOX_MIN
+					});
+				}
+			})
 			
 			// Controla la propiedad cantidad mínima de caracteres de un campo
 			form.find("[data-" + defaultOptions.namespace + "-length-min]").each(function(index, item){
@@ -178,6 +237,8 @@
 			
 			return isValid;
 		},
+		
+		// Realiza el envío del formulario. Invoca a la validación antes de realizar cualquier acción
 		submit 	: function(event) {
 			event.preventDefault();
 			 
@@ -187,6 +248,7 @@
 			{				
 				if(form.attr('data-' + defaultOptions.namespace +  '-post-ajax'))
 				{
+					//Envío del formulario vía AJAX
 					var url		= form.attr("action");
 					var method	= form.attr("method");
 					var success	= form.attr("data-" + defaultOptions.namespace + "-ajax-success");
@@ -210,11 +272,13 @@
 				}
 				else
 				{
+					//Envío vía POST tradicional
 					form.submit();
 				}	
 			}
 			else
 			{				
+				// Muestra los errores según la forma indicada por el usuario
 				switch(defaultOptions.errorDisplay)
 				{
 					case $.ambarFormsValidator.Display.INSIDE			:
@@ -232,12 +296,13 @@
 				}
 			}
 		},
+		// Muestra los errores dentro del campo a validar		
 		display_inside	: function() {
 			$(errorsCollection).each(function(index, item){
 				item.field.addClass(defaultOptions.errorClass);
 				var msg	= defaultOptions.errorMessages[item.error];
 				
-				// En caso de los checkbox y radio aplica el estilo sobre el label
+				// En caso de los checkbox aplica el estilo sobre el label
 				switch(item.field.attr("type"))
 				{
 					case "checkbox":
@@ -251,6 +316,16 @@
 				
 				switch(item.error)
 				{
+					case $.ambarFormsValidator.Validator.CHECKBOX_MIN:
+						var len	= item.field.attr("data-" + defaultOptions.namespace + "-check");
+						
+						if(len == 1)
+							len	= len + " opción";
+						else
+							len	= len + " opciones";
+						
+						msg		= msg.replace("{0}", len);
+						break;
 					case $.ambarFormsValidator.Validator.LENGTH_MIN:
 						var len	= item.field.attr("data-" + defaultOptions.namespace + "-length-min");
 						
@@ -315,7 +390,8 @@
 			LENGTH_MAX		: "maxLength",
 			EQUAL_TO		: "equalTo",
 			SELECT_DEFAULT	: "default",
-			FORMAT			: "format"
+			FORMAT			: "format",
+			CHECKBOX_MIN	: "minCheckbox"
 		},
 		Display		: {
 			INSIDE			: "inside",

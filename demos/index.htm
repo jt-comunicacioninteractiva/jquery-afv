@@ -4,7 +4,7 @@
 		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 		<title>Demos - jQuery Ambar Forms Validator :: JT - Comunicación Interactiva</title>
 		<script src="../js/jquery-1.8.2.min.js"></script>
-		<script src="../development/jquery-afv-0.2.0.js"></script>
+		<script src="../js/jquery-afv-0.2.1.min.js"></script>
 	</head>
 	
 	<script>
@@ -20,7 +20,8 @@
 	</script>
 	
 	<style>
-		input.afv-field-error {
+		input.afv-field-error,
+		fieldset.afv-field-error {
 			background: #ffc9cf;
 			border: 1px solid red;
 		} 
@@ -79,6 +80,7 @@
 		
 		<!-- Ejemplo 3: Validación checkbox -->
 		<h2>Validación checkbox</h2>
+		<p>El siguiente ejemplo muestra la validación de un formulario con un checkbox individual</p>
 		<form method="post" action="" data-afv-validate="true">
 			<label for="name">Nombre</label>
 			<input type="text" name="name" data-afv-required="true" />
@@ -89,5 +91,31 @@
 			<input type="button" value="Enviar" data-afv-role="submit" />
 		</form>
 		
+		<!-- Ejemplo 4: Validación múltiples checkbox -->
+		<p>El siguiente ejemplo muestra la validación de un formulario con múltiples checkbox (Agrupados en un fieldset)</p>
+		<form method="post" action="" data-afv-validate="true">
+			<label for="name">Nombre</label>
+			<input type="text" name="name" data-afv-required="true" />
+			<fieldset data-afv-check="2">
+				<legend>Seleccione sus gustos</legend>
+				<input type="checkbox" name="likes-1" value="true" />Opción 1
+				<input type="checkbox" name="likes-2" value="true" />Opción 2
+				<input type="checkbox" name="likes-3" value="true" />Opción 3
+				<input type="checkbox" name="likes-4" value="true" />Opción 4
+			</fieldset>
+			<input type="button" value="Enviar" data-afv-role="submit" />
+		</form>
+		<!-- Ejemplo 5: Validación de radio buttons -->
+		<p>El siguiente ejemplo muestra la validación de un formulario con radio buttons</p>
+		<form method="post" action="" data-afv-validate="true">
+			<label>Género</label>
+			<fieldset data-afv-required="true">
+				<input type="radio" name="gender" value="M" />Hombre
+				<input type="radio" name="gender" value="F" />Mujer
+			</fieldset>
+			<label for="name">Nombre</label>
+			<input type="text" name="name" data-afv-required="true" />
+			<input type="button" value="Enviar" data-afv-role="submit" />
+		</form>
 	</body>
 </html>
