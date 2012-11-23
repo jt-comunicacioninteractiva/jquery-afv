@@ -6,6 +6,11 @@ Utiliza los atributos data de HTML5 para configurar el plugin
 
 ## Changelog
 
+### V0.2.2
+Se agregó la funcionalidad que permite realizar las siguientes funciones:
+
++ Agregar la posibilidad de personalizar los mensajes de error para cada campo
+
 ### V0.2.1
 Se agregó la funcionalidad que permite realizar las siguientes validaciones:
 

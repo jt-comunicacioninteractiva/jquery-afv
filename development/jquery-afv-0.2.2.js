@@ -2,7 +2,7 @@
  * jQuery - Ambar Forms Validator
  *
  * @author Javier Trejo @ JT - Comunicación Interactiva
- * @version 0.2.1
+ * @version 0.2.2
  * @see http://jt-comunicacioninteractiva.github.com/jquery-afv
  *
  * Este plugin se utiliza para validar formularios antes de ser enviados al
@@ -43,6 +43,92 @@
 		
 		// Clase CSS por default para los campos con error
 		errorClass			: "afv-field-error"
+	};
+	
+	// Arma los mensajes de error en función del mensaje predefinido o el indicado por el usuario
+	function errorMessageComposer(item)
+	{
+		var msg	= defaultOptions.errorMessages[item.error];
+		
+		switch(item.error)
+		{
+			case $.ambarFormsValidator.Validator.CHECKBOX_MIN:
+				if(item.field.attr("data-" + defaultOptions.namespace + "-check-error-message") != undefined)
+				{
+					msg	= item.field.attr("data-" + defaultOptions.namespace + "-check-error-message");
+				}
+				else
+				{
+					var len	= item.field.attr("data-" + defaultOptions.namespace + "-check");
+					
+					if(len == 1)
+						len	= len + " opción";
+					else
+						len	= len + " opciones";
+					
+					msg		= msg.replace("{0}", len);	
+				}
+				break;
+			case $.ambarFormsValidator.Validator.LENGTH_MIN:
+				if(item.field.attr("data-" + defaultOptions.namespace + "-length-min-error-message") != undefined)
+					msg	= item.field.attr("data-" + defaultOptions.namespace + "-length-min-error-message");
+					
+				var len	= item.field.attr("data-" + defaultOptions.namespace + "-length-min");
+				
+				if(len == 1)
+					len = len + " caracter";
+				else
+					len = len + " caracteres";
+				
+				msg	= msg.replace("{0}", len);
+				break;
+			case $.ambarFormsValidator.Validator.LENGTH_MAX:
+				if(item.field.attr("data-" + defaultOptions.namespace + "-length-max-error-message") != undefined)
+					msg	= item.field.attr("data-" + defaultOptions.namespace + "-length-max-error-message");
+					
+				var len	= item.field.attr("data-" + defaultOptions.namespace + "-length-max");
+				
+				if(len == 1)
+					len = len + " caracter";
+				else
+					len = len + " caracteres";
+				
+				msg	= msg.replace("{0}", len);
+				break;
+			case $.ambarFormsValidator.Validator.EQUAL_TO:
+				if(item.field.attr("data-" + defaultOptions.namespace + "-equal-to-error-message") != undefined)
+				{
+					msg	= item.field.attr("data-" + defaultOptions.namespace + "-equal-to-error-message");
+				}
+				else
+				{
+					var parent	= item.field.attr("data-" + defaultOptions.namespace + "-equal-to");
+					
+					msg	= msg.replace("{0}", $('label[for="' + parent + '"]').html());
+					msg	= msg.replace("{1}", $('label[for="' + item.field.attr("name") + '"]').html());	
+				}
+				break;
+			case $.ambarFormsValidator.Validator.REQUIRED:
+				msg	= item.message;
+				
+				if(item.field.attr("data-" + defaultOptions.namespace + "-required-error-message") != undefined)
+					msg	= item.field.attr("data-" + defaultOptions.namespace + "-required-error-message");
+				break;
+			case $.ambarFormsValidator.Validator.FORMAT:
+				msg	= item.message;
+				
+				if(item.field.attr("data-" + defaultOptions.namespace + "-format-error-message") != undefined)
+					msg	= item.field.attr("data-" + defaultOptions.namespace + "-format-error-message");
+				break;
+			case $.ambarFormsValidator.Validator.SELECT_DEFAULT:
+				msg	= item.message;
+				
+				if(item.field.attr("data-" + defaultOptions.namespace + "-default-error-message") != undefined)
+					msg	= item.field.attr("data-" + defaultOptions.namespace + "-default-error-message");
+				break;
+		}
+		
+		return msg;
 	};
 
 	var methods = {
@@ -300,7 +386,6 @@
 		display_inside	: function() {
 			$(errorsCollection).each(function(index, item){
 				item.field.addClass(defaultOptions.errorClass);
-				var msg	= defaultOptions.errorMessages[item.error];
 				
 				// En caso de los checkbox aplica el estilo sobre el label
 				switch(item.field.attr("type"))
@@ -314,45 +399,7 @@
 						break;
 				}
 				
-				switch(item.error)
-				{
-					case $.ambarFormsValidator.Validator.CHECKBOX_MIN:
-						var len	= item.field.attr("data-" + defaultOptions.namespace + "-check");
-						
-						if(len == 1)
-							len	= len + " opción";
-						else
-							len	= len + " opciones";
-						
-						msg		= msg.replace("{0}", len);
-						break;
-					case $.ambarFormsValidator.Validator.LENGTH_MIN:
-						var len	= item.field.attr("data-" + defaultOptions.namespace + "-length-min");
-						
-						if(len == 1)
-							len = len + " caracter";
-						else
-							len = len + " caracteres";
-						
-						msg	= msg.replace("{0}", len);
-						break;
-					case $.ambarFormsValidator.Validator.LENGTH_MAX:
-						var len	= item.field.attr("data-" + defaultOptions.namespace + "-length-max");
-						
-						if(len == 1)
-							len = len + " caracter";
-						else
-							len = len + " caracteres";
-						
-						msg	= msg.replace("{0}", len);
-						break;
-					case $.ambarFormsValidator.Validator.EQUAL_TO:
-						var parent	= item.field.attr("data-" + defaultOptions.namespace + "-equal-to");
-						
-						msg	= msg.replace("{0}", $('label[for="' + parent + '"]').html());
-						msg	= msg.replace("{1}", $('label[for="' + item.field.attr("name") + '"]').html());
-						break;
-				}
+				var msg	= errorMessageComposer(item);
 				
 				if(item.field.attr("title") == undefined)
 					item.field.attr("title", msg);
