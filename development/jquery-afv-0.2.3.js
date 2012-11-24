@@ -2,7 +2,7 @@
  * jQuery - Ambar Forms Validator
  *
  * @author Javier Trejo @ JT - Comunicación Interactiva
- * @version 0.2.2
+ * @version 0.2.3
  * @see http://jt-comunicacioninteractiva.github.com/jquery-afv
  *
  * Este plugin se utiliza para validar formularios antes de ser enviados al
@@ -40,6 +40,12 @@
 		
 		// Indica la forma en que se muestran los mensajes de error
 		errorDisplay		: "inside",
+		
+		// Identificador para el visor de los mensajes de error (superior o inferior)
+		errorDisplayId		: "afv-error-viewer",
+		
+		// Tag para componer el visor de los mensajes de error (superior o inferior)
+		errorDisplayTag		: "div",
 		
 		// Clase CSS por default para los campos con error
 		errorClass			: "afv-field-error"
@@ -365,19 +371,21 @@
 			else
 			{				
 				// Muestra los errores según la forma indicada por el usuario
-				switch(defaultOptions.errorDisplay)
+				var display	= defaultOptions.errorDisplay;
+				
+				if(form.attr("data-" + defaultOptions.namespace + "-error-display-position") != undefined)
+					display	=  form.attr("data-" + defaultOptions.namespace + "-error-display-position");
+
+				switch(display)
 				{
 					case $.ambarFormsValidator.Display.INSIDE			:
 						methods.display_inside();
 						break;
-					case $.ambarFormsValidator.Display.OUTSIDE			:
-						methods.display_outside();
-						break;
 					case $.ambarFormsValidator.Display.FIELDS_BEFORE	:
-						methods.display_before();
+						methods.display_viewer(form, $.ambarFormsValidator.Display.FIELDS_BEFORE);
 						break;
 					case $.ambarFormsValidator.Display.FIELDS_AFTER		:
-						methods.display_after();
+						methods.display_viewer(form, $.ambarFormsValidator.Display.FIELDS_AFTER);
 						break;
 				}
 			}
@@ -407,14 +415,46 @@
 					item.field.attr("title", item.field.attr("title") + "\n" + msg);
 			});
 		},
-		display_outside	: function() {
-			console.log("V0.2 - Muestra los mensajes de error fuera del campo a través de un elemento span");
-		},
-		fields_before	: function() {
-			console.log("V0.3 - Muestra los mensajes de error todos juntos al principio del formulario en un elemento div");
-		},
-		fields_after	: function() {
-			console.log("V0.3 - Muestra los mensajes de error todos juntos al final del formulario en un elemento div");
+		display_viewer	: function(form, position) {
+			var viewer	= form.find("#" + defaultOptions.errorDisplayId);
+			
+			if(viewer.length == 0)
+			{
+				viewer	= $("<" + defaultOptions.errorDisplayTag + "></" + defaultOptions.errorDisplayTag + ">").attr("id", defaultOptions.errorDisplayId);
+				
+				if(position == $.ambarFormsValidator.Display.FIELDS_BEFORE)
+					viewer.prependTo(form);
+					
+				if(position == $.ambarFormsValidator.Display.FIELDS_AFTER)
+					viewer.appendTo(form);
+			}
+			
+			viewer.html("");
+			
+			var messages= $("<ul></ul>");
+				
+			$(errorsCollection).each(function(index, item){
+				item.field.addClass(defaultOptions.errorClass);
+				
+				var label	= item.field.attr("name");
+				label		= $('label[for="' + label + '"]');
+				
+				// En caso de los checkbox aplica el estilo sobre el label
+				switch(item.field.attr("type"))
+				{
+					case "checkbox":
+						label.addClass(defaultOptions.errorClass);
+						label.attr("title", msg);
+						break;
+				}
+								
+				var msg		= "<em>" + label.html() + ": </em>" + errorMessageComposer(item);
+				var msgLi	= $("<li></li>").html(msg);
+				
+				messages.append(msgLi);
+			});
+			
+			messages.appendTo(viewer);
 		}
 	};
 
@@ -442,7 +482,6 @@
 		},
 		Display		: {
 			INSIDE			: "inside",
-			OUTSIDE			: "outside",
 			FIELDS_BEFORE	: "before",
 			FIELDS_AFTER	: "after"
 		},

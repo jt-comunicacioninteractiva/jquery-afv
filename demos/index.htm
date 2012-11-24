@@ -4,7 +4,7 @@
 		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 		<title>Demos - jQuery Ambar Forms Validator :: JT - Comunicación Interactiva</title>
 		<script src="../js/jquery-1.8.2.min.js"></script>
-		<script src="../js/jquery-afv-0.2.2.min.js"></script>
+		<script src="../js/jquery-afv-0.2.3.min.js"></script>
 	</head>
 	
 	<script>
@@ -151,6 +151,19 @@
 				<input type="checkbox" name="mod-4" value="true" />Módulo D
 			</fieldset>
 			<input type="button" value="Grabar" data-afv-role="submit" />
+		</form>
+		
+		<!-- Ejemplo 7: Mostrando errores agrupados al inicio del formulario-->
+		<h2>Visor de errores superior</h2>
+		<p>El siguiente ejemplo muestra todos los mensajes de error de los campos en la parte superior del mismo</p>
+		<form method="post" action="" data-afv-validate="true" data-afv-error-display-position="before">
+			<label for="name">Nombre</label>
+			<input type="text" name="name" data-afv-required="true" data-afv-min-length="5" />
+			<label for="surname">Apellido</label>
+			<input type="text" name="surname" />
+			<label for="email">Email</label>
+			<input type="text" name="email" data-afv-required="true" data-afv-format="email" />
+			<input type="button" value="Enviar" data-afv-role="submit" />
 		</form>
 	</body>
 </html>
