@@ -2,7 +2,7 @@
  * jQuery - Ambar Forms Validator
  *
  * @author Javier Trejo @ JT - Comunicación Interactiva
- * @version 0.2.31
+ * @version 0.2.4
  * @see http://jt-comunicacioninteractiva.github.com/jquery-afv
  *
  * Este plugin se utiliza para validar formularios antes de ser enviados al
@@ -11,11 +11,6 @@
  * los atributos data-afv-* y los atributos estandar de HTML para la
  * configuración.
  *
- * TODO v0.3.0
- * 
- * - Corregir la función display_viewer para no recibir el parámetro form 
- *   (primer parámetro) y utilizarlo directamente desde la variable global 
- *   (formToValidate).
  */
 (function($) {
 	// Array de errores que se producen con la validación.
@@ -25,7 +20,7 @@
 	var formToValidate	= null;
 	
 	// Valores por default de los parámetros iniciales
-	var defaultOptions 		= {
+	var defaultOptions 	= {
 		// Espacio de nombres por default para los atributos data-*
 		namespace 		: 'afv',
 		
@@ -60,6 +55,11 @@
 		
 		// Clase CSS por default para los campos con error
 		errorClass			: "afv-field-error"
+	};
+	
+	// Configuraciones iniciales. Aplicadas a nivel script
+	var initialSettings	= {
+		liveObserver	: false
 	};
 	
 	// Arma los mensajes de error en función del mensaje predefinido o el indicado por el usuario
@@ -147,7 +147,45 @@
 		
 		return msg;
 	};
+	
+	// Inicializa las configuraciones enviadas a nievel script (URL)
+	function scriptPreSettings()
+	{
+		var scripts		= $("script");
+		var parameters	= [];
+		
+		scripts.each(function(index, item){
+			var param	= item.src.match(/\w+=\w+/g);
+			
+			if(param != null)
+				$.merge(parameters, param);
+		});
+		
+		var toExtend	= {};
+		
+		$(parameters).each(function(index, item){
+			var exploded	= item.split("=");
+			
+			toExtend[exploded[0]] = eval(exploded[1]);
+		});
+		
+		$.extend(initialSettings, toExtend);
+	};
 
+	// Inicializa las acciones para los formularios que requieren validación
+	function initFormActions(src)
+	{
+		$(src).each(function(index, item){
+			var item	= $(item);
+			var data	= {
+				form		: item
+			};
+			
+			item.find('[data-' + defaultOptions.namespace + '-role=submit]')
+				.bind('click', data, methods.submit);
+		});
+	};
+	
 	// Inicializa el plugin para ser utilizado con un selector
 	$.fn.ambarFormsValidator = function(method) {
 
@@ -164,18 +202,28 @@
 	var methods = {
 		//Inicializa el validador para aquellos formularios que así lo requieren
 		init 	: function(options) {
+			
+			scriptPreSettings();
+			
 			$.extend(defaultOptions, options);
 			
 			$(document).ready(function() {
-				$('[data-' + defaultOptions.namespace + '-validate=true]').each(function(index, item){
-					var item	= $(item);
-					var data	= {
-						form		: item
-					};
-					
-					item.find('[data-' + defaultOptions.namespace + '-role=submit]')
-						.bind('click', data,methods.submit);
-				});
+				initFormActions('[data-' + defaultOptions.namespace + '-validate=true]');
+				
+				/*
+				 * Habilita el validador para funcionar sobre formularios que cargan vía AJAX.
+				 * ATENCIÓN:
+				 * La utilización de esta funcionalidad afecta la performance del script.
+				 */
+				if(initialSettings.liveObserver)
+				{
+					$(document).live("DOMSubtreeModified", function(event){
+						var src = $(event.srcElement);
+						
+						if(src.find('form').length > 0)
+							initFormActions('[data-' + defaultOptions.namespace + '-validate=true]');
+					});	
+				}
 			});
 		},
 		
@@ -487,6 +535,7 @@
 				messages.append(msgLi);
 			});
 			
+			$("<h2>Verifique los siguientes campos antes de continuar</h2>").appendTo(viewer);
 			messages.appendTo(viewer);
 		}
 	};

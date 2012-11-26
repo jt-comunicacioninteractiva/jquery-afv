@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+		<title>Demos - jQuery Ambar Forms Validator :: JT - Comunicación Interactiva</title>
+		<script src="../js/jquery-1.8.2.min.js"></script>
+		<script src="../js/jquery-afv-0.2.4.min.js?liveObserver=true"></script>
+		<script>
+			$(document).ready(function(){
+				$("#loader").bind("click", function(event){
+					event.preventDefault();
+					
+					$("#container").load("remoteform.htm");
+				});
+			})
+		</script>
+	</head>
+	<body>
+		<form method="post" data-afv-validate="true">
+			<label for="name">Nombre</label>
+			<input type="text" name="name" data-afv-required="true" />
+			<input type="button" value="Grabar" data-afv-role="submit" />
+		</form>
+		<input type="button" id="loader" value="Cargar"/>
+		<div id="container"></div>
+	</body>
+</html>
