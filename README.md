@@ -6,6 +6,9 @@ Utiliza los atributos data de HTML5 para configurar el plugin
 
 ## Changelog
 
+### V0.2.31
+Corrección del error #2.
+
 ### V0.2.3
 Se agregó la posibilidad de visualizar los mensajes de error agrupados en la parte superior o inferior del formulario
 

@@ -2,7 +2,7 @@
  * jQuery - Ambar Forms Validator
  *
  * @author Javier Trejo @ JT - Comunicación Interactiva
- * @version 0.2.3
+ * @version 0.2.31
  * @see http://jt-comunicacioninteractiva.github.com/jquery-afv
  *
  * Este plugin se utiliza para validar formularios antes de ser enviados al
@@ -11,9 +11,20 @@
  * los atributos data-afv-* y los atributos estandar de HTML para la
  * configuración.
  *
+ * TODO v0.3.0
+ * 
+ * - Corregir la función display_viewer para no recibir el parámetro form 
+ *   (primer parámetro) y utilizarlo directamente desde la variable global 
+ *   (formToValidate).
  */
 (function($) {
+	// Array de errores que se producen con la validación.
 	var errorsCollection;
+	
+	// Contenedor del formulario
+	var formToValidate	= null;
+	
+	// Valores por default de los parámetros iniciales
 	var defaultOptions 		= {
 		// Espacio de nombres por default para los atributos data-*
 		namespace 		: 'afv',
@@ -137,15 +148,34 @@
 		return msg;
 	};
 
+	// Inicializa el plugin para ser utilizado con un selector
+	$.fn.ambarFormsValidator = function(method) {
+
+		if (methods[method]) {
+			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+		} else if ( typeof method === 'object' || !method) {
+			return methods.init.apply(this, arguments);
+		} else {
+			$.error('Method ' + method + ' does not exist on jQuery.ambarFormsValidator');
+		}
+	};
+
+	// Métodos del objeto $.fn.ambarFormsValidator
 	var methods = {
 		//Inicializa el validador para aquellos formularios que así lo requieren
 		init 	: function(options) {
 			$.extend(defaultOptions, options);
 			
-			$(document).ready(function(){
-				$('[data-' + defaultOptions.namespace + '-validate=true]')
-					.find('[data-' + defaultOptions.namespace + '-role=submit]')
-					.bind('click', methods.submit);
+			$(document).ready(function() {
+				$('[data-' + defaultOptions.namespace + '-validate=true]').each(function(index, item){
+					var item	= $(item);
+					var data	= {
+						form		: item
+					};
+					
+					item.find('[data-' + defaultOptions.namespace + '-role=submit]')
+						.bind('click', data,methods.submit);
+				});
 			});
 		},
 		
@@ -333,18 +363,18 @@
 		// Realiza el envío del formulario. Invoca a la validación antes de realizar cualquier acción
 		submit 	: function(event) {
 			event.preventDefault();
-			 
-			var form = $(this).parent();
 			
-			if(methods.validate(form) == true)
+			formToValidate	= event.data.form;
+			
+			if(methods.validate(formToValidate) == true)
 			{				
-				if(form.attr('data-' + defaultOptions.namespace +  '-post-ajax'))
+				if(formToValidate.attr('data-' + defaultOptions.namespace +  '-post-ajax'))
 				{
 					//Envío del formulario vía AJAX
-					var url		= form.attr("action");
-					var method	= form.attr("method");
-					var success	= form.attr("data-" + defaultOptions.namespace + "-ajax-success");
-					var failure	= form.attr("data-" + defaultOptions.namespace + "-ajax-failure");
+					var url		= formToValidate.attr("action");
+					var method	= formToValidate.attr("method");
+					var success	= formToValidate.attr("data-" + defaultOptions.namespace + "-ajax-success");
+					var failure	= formToValidate.attr("data-" + defaultOptions.namespace + "-ajax-failure");
 	
 					if(typeof success == "string")
 						success	= self[success];
@@ -355,7 +385,7 @@
 					$.ajax({
 						url		: url,
 						type	: method,
-						data	: form.serialize(),
+						data	: formToValidate.serialize(),
 						cache	: false,
 						dataType: "json",
 						success	: success,
@@ -365,7 +395,7 @@
 				else
 				{
 					//Envío vía POST tradicional
-					form.submit();
+					formToValidate.submit();
 				}	
 			}
 			else
@@ -373,8 +403,8 @@
 				// Muestra los errores según la forma indicada por el usuario
 				var display	= defaultOptions.errorDisplay;
 				
-				if(form.attr("data-" + defaultOptions.namespace + "-error-display-position") != undefined)
-					display	=  form.attr("data-" + defaultOptions.namespace + "-error-display-position");
+				if(formToValidate.attr("data-" + defaultOptions.namespace + "-error-display-position") != undefined)
+					display	=  formToValidate.attr("data-" + defaultOptions.namespace + "-error-display-position");
 
 				switch(display)
 				{
@@ -382,14 +412,15 @@
 						methods.display_inside();
 						break;
 					case $.ambarFormsValidator.Display.FIELDS_BEFORE	:
-						methods.display_viewer(form, $.ambarFormsValidator.Display.FIELDS_BEFORE);
+						methods.display_viewer(formToValidate, $.ambarFormsValidator.Display.FIELDS_BEFORE);
 						break;
 					case $.ambarFormsValidator.Display.FIELDS_AFTER		:
-						methods.display_viewer(form, $.ambarFormsValidator.Display.FIELDS_AFTER);
+						methods.display_viewer(formToValidate, $.ambarFormsValidator.Display.FIELDS_AFTER);
 						break;
 				}
 			}
 		},
+		
 		// Muestra los errores dentro del campo a validar		
 		display_inside	: function() {
 			$(errorsCollection).each(function(index, item){
@@ -415,6 +446,8 @@
 					item.field.attr("title", item.field.attr("title") + "\n" + msg);
 			});
 		},
+		
+		// Muetra los errores agrupador al inicio o al final del formulario
 		display_viewer	: function(form, position) {
 			var viewer	= form.find("#" + defaultOptions.errorDisplayId);
 			
@@ -457,17 +490,6 @@
 			messages.appendTo(viewer);
 		}
 	};
-
-	$.fn.ambarFormsValidator = function(method) {
-
-		if (methods[method]) {
-			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if ( typeof method === 'object' || !method) {
-			return methods.init.apply(this, arguments);
-		} else {
-			$.error('Method ' + method + ' does not exist on jQuery.ambarFormsValidator');
-		}
-	};
 	
 	// Define las constantes de las validaciones a nivel global
 	$.ambarFormsValidator	= {
@@ -489,4 +511,6 @@
 	} 
 	
 })(jQuery);
+
+// Autoinicializa el plugin
 $(document).ambarFormsValidator();
