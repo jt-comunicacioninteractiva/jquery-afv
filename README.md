@@ -6,6 +6,9 @@ Utiliza los atributos data de HTML5 para configurar el plugin
 
 ## Changelog
 
+### V0.2.4
+Implementación de la funcionalidad para permitir la validación de formularios cargados vía AJAX luego de la carga inicial de la página.
+
 ### V0.2.31
 Corrección del error #2.
 
